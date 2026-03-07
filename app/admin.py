@@ -1,14 +1,17 @@
 from django.contrib import admin
-from .models import user, category, Subscription
+from .models import User, Category, Subscription
 from listing.models import announcement, AIGeneration
-@admin.register(user)
-class UserAdmin(admin.ModelAdmin):
-    list_display = ('username', 'email', 'is_authenticated')
-    search_fields = ('username', 'email')
-    list_filter = ('is_authenticated',)
+from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+@admin.register(User)
+class UserAdmin(BaseUserAdmin):
+    list_display = ('phone_number', 'first_name', 'last_name', 'is_staff', 'is_active')
+    list_filter = ('is_staff', 'is_active')
+    search_fields = ('phone_number', 'first_name', 'last_name')
+    ordering = ('phone_number',)
 
 
-@admin.register(category)
+@admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ('title', 'img')
     search_fields = ('title',)

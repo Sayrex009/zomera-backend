@@ -1,6 +1,6 @@
 # listing/models.py
 from django.db import models
-from app.models import user, category
+from app.models import User, Category
 
 class announcement(models.Model):
     title = models.CharField(max_length=100)
@@ -12,13 +12,13 @@ class announcement(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     area = models.IntegerField()
     rooms = models.IntegerField()
-    category = models.ManyToManyField(category, related_name='announcements') 
+    category = models.ManyToManyField(Category, related_name='announcements') 
     def __str__(self):
         return self.title
 
 
 class AIGeneration(models.Model):
-    user = models.ForeignKey(user, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     listing = models.ForeignKey(announcement, on_delete=models.CASCADE)
     prompt = models.TextField()
     result = models.TextField()
