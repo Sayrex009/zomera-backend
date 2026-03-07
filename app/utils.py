@@ -1,13 +1,13 @@
-from twilio.rest import Client
-from django.conf import settings
 import random
-def send_sms(phone_number, message):
-    client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
-    client.messages.create(
-        body=message,
-        from_=settings.TWILIO_PHONE_NUMBER,
-        to=phone_number
-    )
-    
-def generate_otp():
-    return str(random.randint(100000, 999999))
+from django.core.mail import send_mail
+from django.conf import settings
+
+def generate_otp(length=6):
+    return str(random.randint(10**(length-1), 10**length - 1))
+
+def send_otp_email(email, otp):
+    subject = "Ваш код подтверждения"
+    message = f"Ваш OTP код: {otp}"
+    from_email = settings.EMAIL_HOST_USER
+    recipient_list = [email]
+    send_mail(subject, message, from_email, recipient_list)

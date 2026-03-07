@@ -1,10 +1,9 @@
 from django.contrib import admin
 from django.urls import path
-from app.views import RegisterAPI, VerifyOTPAPI
+from app.views import RegisterEmailAPI, VerifyEmailOTPAPI
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/register/', RegisterAPI.as_view(), name='api_register'),
-    path('api/verify-otp/', VerifyOTPAPI.as_view(), name='api_verify_otp'),
-
+    path('register-email/', RegisterEmailAPI.as_view(), name='register-email'),
+    path('verify-email-otp/', VerifyEmailOTPAPI.as_view(), name='verify-email-otp'),
 ]
+
