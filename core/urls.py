@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path
-from app.views import LoginAPI, RegisterEmailAPI, VerifyEmailOTPAPI, AdvertisementListAPI, AnnouncementListAPI, FavoriteListAPI
+from app.views import *
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
@@ -26,6 +26,7 @@ urlpatterns = [
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/ads/', AdvertisementListAPI.as_view(), name='advertisement-list'),
+    path('api/search/', SearchAnnouncementAPI.as_view(), name='search-announcements'),
     path('api/favorites/', FavoriteListAPI.as_view(), name='favorite-list'),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),

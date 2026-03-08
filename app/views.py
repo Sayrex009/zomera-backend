@@ -9,6 +9,7 @@ from .serializers import *
 from .utils import send_otp_email, generate_otp
 from app.services.otp import generate_otp, send_otp_email, save_otp, verify_otp
 from listing.models import *
+from django.db.models import Q
 User = get_user_model()
 
 class RegisterEmailAPI(APIView):
@@ -109,3 +110,20 @@ class FavoriteListAPI(APIView):
             favorite.delete()
             return Response({"message": "Sevimlilardan o'chirildi"}, status=status.HTTP_200_OK)
         return Response({"message": "Sevimlilarga qo'shildi"}, status=status.HTTP_201_CREATED)
+       
+class SearchAnnouncementAPI(APIView):
+    def get(self, request):
+        query = request.GET.get("q", "") 
+
+        if query:
+            ads = announcement.objects.filter(
+                Q(title__icontains=query) |
+                Q(description__icontains=query) |
+                Q(city__icontains=query) |
+                Q(address__icontains=query)
+            )
+        else:
+            ads = announcement.objects.all()
+
+        serializer = AdvertisementSerializer(ads, many=True)
+        return Response(serializer.data)
