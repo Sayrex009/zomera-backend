@@ -5,15 +5,13 @@ from django.contrib.auth import get_user_model, authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.db.models import Q
 
-# Импорты твоих моделей и сервисов
 from app.models import EmailOTP
-from .serializers import AdvertisementSerializer # Убедись, что этот сериализатор работает с моделью announcement
+from .serializers import AdvertisementSerializer 
 from app.services.otp import generate_otp, send_otp_email, save_otp, verify_otp
 from listing.models import announcement, Favorite, Category
 
 User = get_user_model()
 
-# --- РЕГИСТРАЦИЯ И OTP ---
 
 class RegisterEmailAPI(APIView):
     """
@@ -30,11 +28,9 @@ class RegisterEmailAPI(APIView):
         if User.objects.filter(email=email).exists():
             return Response({"error": "Bu email allaqachon ro'yxatdan o'tgan"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Генерация и сохранение кода в БД
         otp_code = generate_otp()
         save_otp(email, otp_code)
         
-        # Отправка на почту
         try:
             send_otp_email(email, otp_code)
             return Response({"message": "OTP kod emailingizga yuborildi"}, status=status.HTTP_200_OK)
@@ -48,25 +44,22 @@ class VerifyEmailOTPAPI(APIView):
     Ожидает: email, password, code (otp).
     """
     def post(self, request):
-        otp = request.data.get("code") # В React мы назвали это 'code'
+        otp = request.data.get("code")
         email = request.data.get("email")
         password = request.data.get("password")
 
         if not email or not otp or not password:
             return Response({"error": "Ma'lumotlar to'liq emas (email, parol va kod kerak)"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Проверка кода через твой сервис
         if not verify_otp(email, otp):
             return Response({"error": "Noto'g'ri yoki muddati o'tgan OTP kod"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Создание пользователя
         try:
             if User.objects.filter(email=email).exists():
                 return Response({"error": "Foydalanuvchi allaqachon yaratilgan"}, status=status.HTTP_400_BAD_REQUEST)
             
             user = User.objects.create_user(email=email, password=password)
             
-            # Сразу выдаем токены, чтобы пользователь был залогинен
             refresh = RefreshToken.for_user(user)
             
             return Response({
@@ -79,7 +72,6 @@ class VerifyEmailOTPAPI(APIView):
             return Response({"error": "Xatolik yuz berdi: " + str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
-# --- АВТОРИЗАЦИЯ ---
 
 class LoginAPI(APIView):
     def post(self, request):
@@ -101,11 +93,10 @@ class LoginAPI(APIView):
         })
 
 
-# --- ОБЪЯВЛЕНИЯ И ПОИСК ---
 
 class AdvertisementListAPI(APIView):
     def get(self, request):
-        # Используем модель announcement, так как Advertisement не найден
+        
         ads = announcement.objects.all().order_by('-id')
         serializer = AdvertisementSerializer(ads, many=True)
         return Response(serializer.data)
@@ -115,7 +106,6 @@ class AnnouncementListAPI(APIView):
     def get(self, request, pk):
         try:
             ad = announcement.objects.get(id=pk)
-            # Увеличиваем счетчик просмотров
             ad.views += 1
             ad.save()
             serializer = AdvertisementSerializer(ad)
